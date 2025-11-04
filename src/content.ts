@@ -1,3 +1,5 @@
+import heroImageUrl from "../assets/AV-Installatie.jpg";
+
 export const siteContent = {
   name: "Koert Manni",
   tagline: "AV Installatie",
@@ -9,4 +11,4 @@ export const siteContent = {
   }
 } as const;
 
-export const backgroundImage = "/av-installatie.jpg";
+export const backgroundImage = heroImageUrl;

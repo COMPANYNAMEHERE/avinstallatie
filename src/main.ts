@@ -1,3 +1,4 @@
+import headerButtonSrc from "../assets/headerbutton-transparent.png";
 import "./style.css";
 import { backgroundImage, siteContent } from "./content";
 
@@ -25,7 +26,7 @@ app.innerHTML = `
         aria-controls="primary-sidebar"
         aria-expanded="false"
       >
-        <img src="/headerbutton-transparent.png" alt="" />
+        <img src="${headerButtonSrc}" alt="" />
       </button>
     </header>
     <main class="landing" role="main" aria-labelledby="site-title" id="home">
