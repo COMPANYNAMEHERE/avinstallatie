@@ -1,4 +1,4 @@
-import heroImageUrl from "../assets/AV-Installatie.jpg";
+import heroImageUrl from "../assets/av-installatie-transparent.png";
 
 export const siteContent = {
   name: "Koert Manni",

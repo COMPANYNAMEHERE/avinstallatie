@@ -74,31 +74,14 @@ app.innerHTML = `
         </form>
 
         <p class="contact__status" role="status" aria-live="polite"></p>
-
-        <div class="contact-thankyou" hidden>
-          <div class="contact-thankyou__content">
-            <h2>Message sent</h2>
-            <p>Thanks for reaching out. Koert will get back to you shortly.</p>
-            <p class="contact-thankyou__meta">Redirecting in <span data-countdown>5</span> seconds…</p>
-          </div>
-        </div>
       </section>
     </main>
   </div>
 `;
 
 const form = app.querySelector<HTMLFormElement>(".contact-form");
-const thankYou = app.querySelector<HTMLDivElement>(".contact-thankyou");
-const countdownRef = app.querySelector<HTMLElement>("[data-countdown]");
 const contactCard = app.querySelector<HTMLDivElement>(".contact__card");
 const statusBanner = app.querySelector<HTMLParagraphElement>(".contact__status");
-
-const toggleView = (isThankYou: boolean) => {
-  if (!form || !thankYou) return;
-
-  form.hidden = isThankYou;
-  thankYou.hidden = !isThankYou;
-};
 
 if (contactCard) {
   const handlePointer = (event: PointerEvent) => {
@@ -119,7 +102,7 @@ if (contactCard) {
   });
 }
 
-if (form && thankYou && countdownRef && statusBanner) {
+if (form && statusBanner) {
   const submitButton = form.querySelector<HTMLButtonElement>(".contact-form__submit");
 
   form.addEventListener("submit", async (event) => {
@@ -165,22 +148,13 @@ if (form && thankYou && countdownRef && statusBanner) {
         throw new Error("Failed to send message. Please try again.");
       }
 
-      toggleView(true);
       statusBanner.dataset.state = "success";
+      statusBanner.textContent = "Message sent! Redirecting...";
       form.reset();
 
-      let secondsRemaining = 5;
-      countdownRef.textContent = secondsRemaining.toString();
-
-      const countdownTimer = window.setInterval(() => {
-        secondsRemaining -= 1;
-        countdownRef.textContent = secondsRemaining.toString();
-
-        if (secondsRemaining <= 0) {
-          window.clearInterval(countdownTimer);
-          window.location.href = "./contact.html";
-        }
-      }, 1000);
+      window.setTimeout(() => {
+        window.location.href = "./contact-success.html";
+      }, 600);
     } catch (error) {
       statusBanner.textContent =
         error instanceof Error
