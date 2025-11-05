@@ -519,47 +519,12 @@ body.no-scroll {
 }
 
 .landing__description {
-  margin: 0 0 2rem;
+  margin: 0;
   font-size: 1.05rem;
-  color: rgba(0, 0, 0, 0.68);
+  color: rgba(30, 30, 30, 0.75);
   opacity: 0;
   transform: translateY(30px);
   animation: riseUp 600ms ease forwards 460ms;
-}
-
-.landing__cta {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.8rem 1.8rem;
-  border-radius: 10px;
-  font-weight: 500;
-  font-size: 0.95rem;
-  color: var(--heading);
-  background: rgba(255, 255, 255, 0.95);
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  text-decoration: none;
-  transition: transform 150ms ease, background 150ms ease, box-shadow 150ms ease, color 150ms ease;
-  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.18);
-  opacity: 0;
-  transform: translateY(30px);
-  animation: riseUp 600ms ease forwards 520ms;
-}
-
-.landing__cta:hover {
-  background: rgba(255, 255, 255, 1);
-  color: var(--heading);
-  transform: translateY(-1px);
-  box-shadow: 0 20px 36px rgba(0, 0, 0, 0.22);
-}
-
-.landing__cta:active {
-  transform: translateY(0);
-}
-
-.landing__cta:focus-visible {
-  outline: 2px solid rgba(0, 0, 0, 0.55);
-  outline-offset: 4px;
 }
 
 @media (prefers-reduced-motion: reduce) {

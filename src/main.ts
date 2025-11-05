@@ -37,7 +37,6 @@ app.innerHTML = `
         <p class="landing__tagline">${siteContent.tagline}</p>
         <h1 id="site-title">${siteContent.name}</h1>
         <p class="landing__description">${siteContent.description}</p>
-        <a class="landing__cta" href="${siteContent.cta.href}">${siteContent.cta.label}</a>
       </div>
     </main>
     <div id="about" class="anchor-spacer" aria-hidden="true"></div>
