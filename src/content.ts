@@ -7,7 +7,7 @@ export const siteContent = {
     "Tailored audio-visual installations that blend seamlessly with every environment.",
   cta: {
     label: "Plan a call",
-    href: "mailto:koert@avinstallatie.nl"
+    href: "./contact.html"
   }
 } as const;
 

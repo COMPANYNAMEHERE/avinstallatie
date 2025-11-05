@@ -12,9 +12,9 @@ app.innerHTML = `
   <div class="site">
     <aside id="primary-sidebar" class="sidebar" aria-hidden="true">
       <nav class="sidebar__nav" aria-label="Primary navigation">
-        <a href="#home">Homepage</a>
-        <a href="#about">About</a>
-        <a href="#contact">Contact</a>
+        <a href="./index.html#home">Homepage</a>
+        <a href="./index.html#projects">Projects</a>
+        <a href="./contact.html">Contact</a>
       </nav>
     </aside>
     <button class="sidebar__overlay" type="button" aria-label="Close navigation"></button>
@@ -49,6 +49,7 @@ const site = app.querySelector<HTMLDivElement>(".site");
 const sidebar = app.querySelector<HTMLElement>("#primary-sidebar");
 const scrollButton = app.querySelector<HTMLButtonElement>(".header-scroll");
 const overlayButton = app.querySelector<HTMLButtonElement>(".sidebar__overlay");
+const landingPanel = app.querySelector<HTMLDivElement>(".landing__content");
 const navLinks = Array.from(
   app.querySelectorAll<HTMLAnchorElement>(".sidebar__nav a")
 );
@@ -86,3 +87,21 @@ document.addEventListener("keydown", (event) => {
     setSidebarState(false);
   }
 });
+
+if (landingPanel) {
+  landingPanel.addEventListener("pointermove", (event) => {
+    const rect = landingPanel.getBoundingClientRect();
+    const relativeX = (event.clientX - rect.left) / rect.width;
+    const relativeY = (event.clientY - rect.top) / rect.height;
+    const offsetX = (relativeX - 0.5) * 60;
+    const offsetY = (relativeY - 0.5) * 60;
+
+    landingPanel.style.setProperty("--glow-x", `${offsetX}px`);
+    landingPanel.style.setProperty("--glow-y", `${offsetY}px`);
+  });
+
+  landingPanel.addEventListener("pointerleave", () => {
+    landingPanel.style.setProperty("--glow-x", "0px");
+    landingPanel.style.setProperty("--glow-y", "0px");
+  });
+}
