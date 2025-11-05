@@ -16,7 +16,7 @@ const categoryOptions = CONTACT_CATEGORIES.map(
 app.innerHTML = `
   <div class="site contact-page">
     <header class="site__header">
-      <a class="header-scroll header-scroll--link" href="./index.html" aria-label="Return to homepage">
+      <a class="header-scroll header-scroll--link" href="./" aria-label="Return to homepage">
         <img src="${headerButtonSrc}" alt="" />
       </a>
     </header>

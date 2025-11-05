@@ -12,8 +12,8 @@ app.innerHTML = `
   <div class="site">
     <aside id="primary-sidebar" class="sidebar" aria-hidden="true">
       <nav class="sidebar__nav" aria-label="Primary navigation">
-        <a href="./index.html#home">Homepage</a>
-        <a href="./index.html#projects">Projects</a>
+        <a href="./#home">Homepage</a>
+        <a href="./#projects">Projects</a>
         <a href="./contact.html">Contact</a>
       </nav>
     </aside>
