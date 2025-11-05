@@ -3,6 +3,9 @@ import "./style.css";
 import { siteContent } from "./content";
 import { CONTACT_CATEGORIES, CONTACT_ENDPOINT, KOERT_EMAIL } from "./config";
 
+const rawBase = import.meta.env.BASE_URL ?? "/";
+const basePath = rawBase.endsWith("/") ? rawBase : `${rawBase}/`;
+
 const app = document.querySelector<HTMLDivElement>("#app");
 
 if (!app) {
@@ -16,7 +19,7 @@ const categoryOptions = CONTACT_CATEGORIES.map(
 app.innerHTML = `
   <div class="site contact-page">
     <header class="site__header">
-      <a class="header-scroll header-scroll--link" href="./" aria-label="Return to homepage">
+      <a class="header-scroll header-scroll--link" href="${basePath}" aria-label="Return to homepage">
         <img src="${headerButtonSrc}" alt="" />
       </a>
     </header>

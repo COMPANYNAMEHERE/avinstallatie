@@ -2,6 +2,9 @@ import headerButtonSrc from "../assets/headerbutton-transparent.png";
 import "./style.css";
 import { backgroundImage, siteContent } from "./content";
 
+const rawBase = import.meta.env.BASE_URL ?? "/";
+const basePath = rawBase.endsWith("/") ? rawBase : `${rawBase}/`;
+
 const app = document.querySelector<HTMLDivElement>("#app");
 
 if (!app) {
@@ -12,9 +15,9 @@ app.innerHTML = `
   <div class="site">
     <aside id="primary-sidebar" class="sidebar" aria-hidden="true">
       <nav class="sidebar__nav" aria-label="Primary navigation">
-        <a href="./#home">Homepage</a>
-        <a href="./#projects">Projects</a>
-        <a href="./contact.html">Contact</a>
+        <a href="${basePath}#home">Homepage</a>
+        <a href="${basePath}#projects">Projects</a>
+        <a href="${basePath}contact.html">Contact</a>
       </nav>
     </aside>
     <button class="sidebar__overlay" type="button" aria-label="Close navigation"></button>

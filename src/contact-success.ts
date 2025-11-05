@@ -1,6 +1,9 @@
 import headerButtonSrc from "../assets/headerbutton-transparent.png";
 import "./style.css";
 
+const rawBase = import.meta.env.BASE_URL ?? "/";
+const basePath = rawBase.endsWith("/") ? rawBase : `${rawBase}/`;
+
 const app = document.querySelector<HTMLDivElement>("#app");
 
 if (!app) {
@@ -10,7 +13,7 @@ if (!app) {
 app.innerHTML = `
   <div class="site contact-page">
     <header class="site__header">
-      <a class="header-scroll header-scroll--link" href="./" aria-label="Return to homepage">
+      <a class="header-scroll header-scroll--link" href="${basePath}" aria-label="Return to homepage">
         <img src="${headerButtonSrc}" alt="" />
       </a>
     </header>
@@ -22,7 +25,7 @@ app.innerHTML = `
             <h1>Message sent</h1>
             <p>Thanks for reaching out. Koert will get back to you shortly.</p>
             <p class="contact-thankyou__meta">Returning to the contact form in <span data-countdown>5</span> seconds…</p>
-            <a class="contact-form__submit contact-form__submit--link" href="./contact.html">Back to contact</a>
+            <a class="contact-form__submit contact-form__submit--link" href="${basePath}contact.html">Back to contact</a>
           </div>
         </div>
       </section>
