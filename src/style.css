@@ -121,6 +121,7 @@ body.no-scroll {
 }
 
 .header-scroll {
+  --drag-offset: 0px;
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -129,8 +130,9 @@ body.no-scroll {
   background: none;
   padding: 0;
   cursor: pointer;
+  touch-action: none;
   transition: transform 220ms ease;
-  transform: translate(-85%, -18%);
+  transform: translate(-85%, -18%) translateX(var(--drag-offset, 0px));
   animation: headerSlideIn 640ms cubic-bezier(0.33, 1, 0.68, 1) 160ms backwards;
 }
 
@@ -139,17 +141,22 @@ body.no-scroll {
 }
 
 .header-scroll:hover {
-  transform: translate(-55%, -18%);
+  transform: translate(-55%, -18%) translateX(var(--drag-offset, 0px));
 }
 
 .header-scroll:active {
-  transform: translate(-65%, -18%);
+  transform: translate(-65%, -18%) translateX(var(--drag-offset, 0px));
 }
 
 .header-scroll:focus-visible {
   outline: 2px solid rgba(0, 0, 0, 0.45);
   outline-offset: 6px;
   border-radius: 6px;
+}
+
+.header-scroll--dragging {
+  cursor: grabbing;
+  transition: none;
 }
 
 .header-scroll img {
@@ -159,15 +166,15 @@ body.no-scroll {
 }
 
 .site--sidebar-open .header-scroll {
-  transform: translate(35%, -18%);
+  transform: translate(35%, -18%) translateX(var(--drag-offset, 0px));
 }
 
 .site--sidebar-open .header-scroll:hover {
-  transform: translate(45%, -18%);
+  transform: translate(45%, -18%) translateX(var(--drag-offset, 0px));
 }
 
 .site--sidebar-open .header-scroll:active {
-  transform: translate(30%, -18%);
+  transform: translate(30%, -18%) translateX(var(--drag-offset, 0px));
 }
 
 .landing {

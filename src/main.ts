@@ -72,8 +72,137 @@ const toggleSidebar = () => {
   setSidebarState(!isOpen);
 };
 
+let skipNextScrollClick = false;
+let skipClickResetTimer: ReturnType<typeof setTimeout> | null = null;
+
+const scheduleSkipClickReset = () => {
+  if (skipClickResetTimer) {
+    window.clearTimeout(skipClickResetTimer);
+  }
+
+  skipClickResetTimer = window.setTimeout(() => {
+    skipNextScrollClick = false;
+    skipClickResetTimer = null;
+  }, 300);
+};
+
 if (scrollButton) {
-  scrollButton.addEventListener("click", toggleSidebar);
+  scrollButton.addEventListener("click", (event) => {
+    if (skipNextScrollClick) {
+      event.preventDefault();
+      event.stopPropagation();
+      skipNextScrollClick = false;
+      if (skipClickResetTimer) {
+        window.clearTimeout(skipClickResetTimer);
+        skipClickResetTimer = null;
+      }
+      return;
+    }
+
+    toggleSidebar();
+  });
+}
+
+const DRAG_OPEN_THRESHOLD = 90;
+const MAX_DRAG_DISTANCE = 150;
+let dragStartX = 0;
+let dragPointerId: number | null = null;
+let isDraggingScroll = false;
+let dragOffset = 0;
+
+const setDragOffset = (value: number) => {
+  if (!scrollButton) {
+    return;
+  }
+
+  scrollButton.style.setProperty("--drag-offset", `${value}px`);
+};
+
+const resetDragState = () => {
+  if (!scrollButton) {
+    return;
+  }
+
+  const pointerId = dragPointerId;
+  dragOffset = 0;
+  isDraggingScroll = false;
+  dragPointerId = null;
+  scrollButton.classList.remove("header-scroll--dragging");
+
+  if (typeof pointerId === "number" && scrollButton.hasPointerCapture(pointerId)) {
+    scrollButton.releasePointerCapture(pointerId);
+  }
+
+  setDragOffset(0);
+};
+
+const handleDragEnd = (event: PointerEvent) => {
+  if (
+    !scrollButton ||
+    !isDraggingScroll ||
+    event.pointerId !== dragPointerId
+  ) {
+    return;
+  }
+
+  const didMove = dragOffset > 6;
+  const shouldOpen = dragOffset >= DRAG_OPEN_THRESHOLD;
+
+  resetDragState();
+
+  if (didMove) {
+    skipNextScrollClick = true;
+    scheduleSkipClickReset();
+  }
+
+  if (shouldOpen) {
+    setSidebarState(true);
+  } else if (didMove) {
+    setSidebarState(false);
+  }
+};
+
+if (scrollButton) {
+  scrollButton.addEventListener("pointerdown", (event) => {
+    if (
+      (event.pointerType === "mouse" && event.button !== 0) ||
+      site?.classList.contains("site--sidebar-open")
+    ) {
+      return;
+    }
+
+    isDraggingScroll = true;
+    dragStartX = event.clientX;
+    dragPointerId = event.pointerId;
+    dragOffset = 0;
+    scrollButton.classList.add("header-scroll--dragging");
+    scrollButton.setPointerCapture(event.pointerId);
+    if (event.pointerType !== "mouse") {
+      event.preventDefault();
+    }
+  });
+
+  scrollButton.addEventListener("pointermove", (event) => {
+    if (!isDraggingScroll || event.pointerId !== dragPointerId) {
+      return;
+    }
+
+    const deltaX = Math.max(0, event.clientX - dragStartX);
+    dragOffset = Math.min(MAX_DRAG_DISTANCE, deltaX);
+    setDragOffset(dragOffset);
+  });
+
+  scrollButton.addEventListener("pointerup", handleDragEnd);
+  scrollButton.addEventListener("pointercancel", handleDragEnd);
+  scrollButton.addEventListener("lostpointercapture", () => {
+    if (!isDraggingScroll) {
+      return;
+    }
+
+    resetDragState();
+    skipNextScrollClick = true;
+    scheduleSkipClickReset();
+  });
 }
 
 if (overlayButton) {
