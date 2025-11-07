@@ -1,9 +1,30 @@
 import headerButtonSrc from "../assets/headerbutton-transparent.png";
 import "./style.css";
-import { backgroundImage, siteContent } from "./content";
+import {
+  backgroundImage,
+  LANGUAGE_OPTIONS,
+  localizedContent,
+  resolveInitialLanguage,
+  storeLanguagePreference,
+  type LanguageCode,
+  isLanguageCode
+} from "./content";
 
 const rawBase = import.meta.env.BASE_URL ?? "/";
 const basePath = rawBase.endsWith("/") ? rawBase : `${rawBase}/`;
+
+const renderLanguageOptions = (selected: LanguageCode) =>
+  LANGUAGE_OPTIONS.map(
+    (option) => `
+      <option value="${option.code}" ${option.code === selected ? "selected" : ""}>
+        ${option.flag}
+      </option>
+    `
+  ).join("");
+
+let currentLanguage: LanguageCode = resolveInitialLanguage();
+const getContent = (language: LanguageCode) => localizedContent[language];
+let currentContent = getContent(currentLanguage);
 
 const app = document.querySelector<HTMLDivElement>("#app");
 
@@ -14,17 +35,47 @@ if (!app) {
 app.innerHTML = `
   <div class="site">
     <aside id="primary-sidebar" class="sidebar" aria-hidden="true">
-      <nav class="sidebar__nav" aria-label="Primary navigation">
-        <a href="${basePath}#home">Homepage</a>
-        <a href="${basePath}contact.html">Contact</a>
+      <nav class="sidebar__nav" aria-label="${currentContent.aria.nav}">
+        <a
+          class="sidebar__nav-link"
+          href="${basePath}#home"
+          data-route="home"
+          data-i18n="nav.home"
+        >
+          ${currentContent.navigation.home}
+        </a>
+        <a
+          class="sidebar__nav-link"
+          href="${basePath}contact.html"
+          data-route="contact"
+          data-i18n="nav.contact"
+        >
+          ${currentContent.navigation.contact}
+        </a>
       </nav>
+      <div class="sidebar__language">
+        <label class="sidebar__language-label" for="language-picker" data-i18n="language.label">
+          ${currentContent.language.label}
+        </label>
+        <select
+          id="language-picker"
+          class="language-picker__select"
+          aria-label="${currentContent.language.label}"
+        >
+          ${renderLanguageOptions(currentLanguage)}
+        </select>
+      </div>
     </aside>
-    <button class="sidebar__overlay" type="button" aria-label="Close navigation"></button>
+    <button
+      class="sidebar__overlay"
+      type="button"
+      aria-label="${currentContent.aria.closeNavigation}"
+    ></button>
     <header class="site__header">
       <button
         class="header-scroll"
         type="button"
-        aria-label="Toggle navigation"
+        aria-label="${currentContent.aria.headerButton}"
         aria-controls="primary-sidebar"
         aria-expanded="false"
       >
@@ -36,9 +87,9 @@ app.innerHTML = `
         <figure class="landing__logo-wrapper" aria-hidden="true">
           <img class="landing__logo" src="${backgroundImage}" alt="" />
         </figure>
-        <p class="landing__tagline">${siteContent.tagline}</p>
-        <h1 id="site-title">${siteContent.name}</h1>
-        <p class="landing__description">${siteContent.description}</p>
+        <p class="landing__tagline" data-i18n="landing.tagline">${currentContent.tagline}</p>
+        <h1 id="site-title">${currentContent.name}</h1>
+        <p class="landing__description" data-i18n="landing.description">${currentContent.description}</p>
       </div>
     </main>
     <div id="about" class="anchor-spacer" aria-hidden="true"></div>
@@ -54,6 +105,27 @@ const landingPanel = app.querySelector<HTMLDivElement>(".landing__content");
 const navLinks = Array.from(
   app.querySelectorAll<HTMLAnchorElement>(".sidebar__nav a")
 );
+const navElement = app.querySelector<HTMLElement>(".sidebar__nav");
+const navHomeLink = app.querySelector<HTMLAnchorElement>('[data-i18n="nav.home"]');
+const navContactLink = app.querySelector<HTMLAnchorElement>('[data-i18n="nav.contact"]');
+const landingTagline = app.querySelector<HTMLParagraphElement>('[data-i18n="landing.tagline"]');
+const landingDescription = app.querySelector<HTMLParagraphElement>('[data-i18n="landing.description"]');
+const languageLabel = app.querySelector<HTMLLabelElement>('[data-i18n="language.label"]');
+const languageSelect = app.querySelector<HTMLSelectElement>("#language-picker");
+
+type RouteKey = "home" | "contact";
+
+const setActiveNav = (route: RouteKey) => {
+  navLinks.forEach((link) => {
+    const isActive = link.dataset.route === route;
+    link.classList.toggle("sidebar__nav-link--active", isActive);
+    if (isActive) {
+      link.setAttribute("aria-current", "page");
+    } else {
+      link.removeAttribute("aria-current");
+    }
+  });
+};
 
 const setSidebarState = (open: boolean) => {
   if (!site || !sidebar || !scrollButton) {
@@ -220,6 +292,8 @@ if (overlayButton) {
   overlayButton.addEventListener("click", () => setSidebarState(false));
 }
 
+setActiveNav("home");
+
 navLinks.forEach((link) => {
   link.addEventListener("click", () => setSidebarState(false));
 });
@@ -229,6 +303,68 @@ document.addEventListener("keydown", (event) => {
     setSidebarState(false);
   }
 });
+
+const applyLanguageToUI = (language: LanguageCode) => {
+  currentContent = getContent(language);
+
+  if (navElement) {
+    navElement.setAttribute("aria-label", currentContent.aria.nav);
+  }
+
+  if (overlayButton) {
+    overlayButton.setAttribute("aria-label", currentContent.aria.closeNavigation);
+  }
+
+  if (scrollButton) {
+    scrollButton.setAttribute("aria-label", currentContent.aria.headerButton);
+  }
+
+  if (navHomeLink) {
+    navHomeLink.textContent = currentContent.navigation.home;
+  }
+
+  if (navContactLink) {
+    navContactLink.textContent = currentContent.navigation.contact;
+  }
+
+  if (landingTagline) {
+    landingTagline.textContent = currentContent.tagline;
+  }
+
+  if (landingDescription) {
+    landingDescription.textContent = currentContent.description;
+  }
+
+  if (languageLabel) {
+    languageLabel.textContent = currentContent.language.label;
+  }
+
+  if (languageSelect) {
+    languageSelect.value = language;
+    languageSelect.setAttribute("aria-label", currentContent.language.label);
+  }
+
+  LANGUAGE_OPTIONS.forEach((option, index) => {
+    if (!languageSelect?.options[index]) {
+      return;
+    }
+    languageSelect.options[index].textContent = option.flag;
+  });
+};
+
+if (languageSelect) {
+  languageSelect.addEventListener("change", (event) => {
+    const nextLanguage = (event.target as HTMLSelectElement).value;
+
+    if (!isLanguageCode(nextLanguage)) {
+      return;
+    }
+
+    currentLanguage = nextLanguage;
+    storeLanguagePreference(nextLanguage);
+    applyLanguageToUI(nextLanguage);
+  });
+}
 
 if (landingPanel) {
   landingPanel.addEventListener("pointermove", (event) => {

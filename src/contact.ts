@@ -1,10 +1,30 @@
 import headerButtonSrc from "../assets/headerbutton-transparent.png";
 import "./style.css";
-import { siteContent } from "./content";
-import { CONTACT_CATEGORIES, CONTACT_ENDPOINT, KOERT_EMAIL } from "./config";
+import {
+  localizedContent,
+  resolveInitialLanguage,
+  type LanguageCode,
+  LANGUAGE_OPTIONS,
+  storeLanguagePreference,
+  isLanguageCode
+} from "./content";
+import { CONTACT_CATEGORIES, CONTACT_ENDPOINT } from "./config";
 
 const rawBase = import.meta.env.BASE_URL ?? "/";
 const basePath = rawBase.endsWith("/") ? rawBase : `${rawBase}/`;
+
+let currentLanguage: LanguageCode = resolveInitialLanguage();
+const getContent = (language: LanguageCode) => localizedContent[language];
+let currentContent = getContent(currentLanguage);
+
+const renderLanguageOptions = (selected: LanguageCode) =>
+  LANGUAGE_OPTIONS.map(
+    (option) => `
+      <option value="${option.code}" ${option.code === selected ? "selected" : ""}>
+        ${option.flag}
+      </option>
+    `
+  ).join("");
 
 const app = document.querySelector<HTMLDivElement>("#app");
 
@@ -18,62 +38,110 @@ const categoryOptions = CONTACT_CATEGORIES.map(
 
 app.innerHTML = `
   <div class="site contact-page">
+    <aside id="primary-sidebar" class="sidebar" aria-hidden="true">
+      <nav class="sidebar__nav" aria-label="${currentContent.aria.nav}">
+        <a
+          class="sidebar__nav-link"
+          href="${basePath}#home"
+          data-route="home"
+          data-i18n="nav.home"
+        >
+          ${currentContent.navigation.home}
+        </a>
+        <a
+          class="sidebar__nav-link"
+          href="${basePath}contact.html"
+          data-route="contact"
+          data-i18n="nav.contact"
+        >
+          ${currentContent.navigation.contact}
+        </a>
+      </nav>
+      <div class="sidebar__language">
+        <label class="sidebar__language-label" for="language-picker" data-i18n="language.label">
+          ${currentContent.language.label}
+        </label>
+        <select
+          id="language-picker"
+          class="language-picker__select"
+          aria-label="${currentContent.language.label}"
+        >
+          ${renderLanguageOptions(currentLanguage)}
+        </select>
+      </div>
+    </aside>
+    <button
+      class="sidebar__overlay"
+      type="button"
+      aria-label="${currentContent.aria.closeNavigation}"
+    ></button>
     <header class="site__header">
-      <a class="header-scroll header-scroll--link" href="${basePath}" aria-label="Return to homepage">
+      <button
+        class="header-scroll"
+        type="button"
+        aria-label="${currentContent.aria.headerButton}"
+        aria-controls="primary-sidebar"
+        aria-expanded="false"
+      >
         <img src="${headerButtonSrc}" alt="" />
-      </a>
+      </button>
     </header>
 
     <main class="contact" role="main" aria-labelledby="contact-title">
       <section class="contact__card" aria-live="polite">
         <div class="contact__intro">
-          <p class="contact__tagline">${siteContent.tagline}</p>
-          <h1 id="contact-title">Get in touch with Koert</h1>
-          <p class="contact__subtext">
-            Share your project goals and Koert will reach out with a tailored AV installation plan.
-          </p>
-          <p class="contact__subtext contact__subtext--alt">
-            Prefer email? <a href="mailto:${KOERT_EMAIL}">${KOERT_EMAIL}</a>
+          <p class="contact__tagline" data-i18n="contact.tagline">${currentContent.tagline}</p>
+          <h1 id="contact-title" data-i18n="contact.heading">${currentContent.contact.heading}</h1>
+          <p class="contact__subtext" data-i18n="contact.intro">
+            ${currentContent.contact.intro}
           </p>
         </div>
 
         <form class="contact-form" autocomplete="on" novalidate>
           <label class="field">
-            <span class="field__label">Full name</span>
-            <input class="field__control" type="text" name="fullName" required placeholder="Your full name" />
+            <span class="field__label" data-i18n="form.nameLabel">${currentContent.contact.form.nameLabel}</span>
+            <input
+              class="field__control"
+              type="text"
+              name="fullName"
+              required
+              placeholder="${currentContent.contact.form.namePlaceholder}"
+            />
           </label>
 
           <label class="field">
-            <span class="field__label">Email address</span>
+            <span class="field__label" data-i18n="form.emailLabel">${currentContent.contact.form.emailLabel}</span>
             <input
               class="field__control"
               type="email"
               name="email"
               required
               inputmode="email"
-              placeholder="name@example.com"
+              placeholder="${currentContent.contact.form.emailPlaceholder}"
             />
           </label>
 
           <label class="field">
-            <span class="field__label">Category</span>
+            <span class="field__label" data-i18n="form.categoryLabel">${currentContent.contact.form.categoryLabel}</span>
             <select class="field__control" name="category" required>
               ${categoryOptions}
             </select>
           </label>
 
           <label class="field field--area">
-            <span class="field__label">Project details</span>
+            <span class="field__label" data-i18n="form.messageLabel">${currentContent.contact.form.messageLabel}</span>
             <textarea
               class="field__control field__control--area"
               name="message"
               rows="6"
               required
-              placeholder="Tell Koert about your space, timeline, and any specific AV needs."
+              placeholder="${currentContent.contact.form.messagePlaceholder}"
             ></textarea>
           </label>
 
-          <button class="contact-form__submit" type="submit">Send message</button>
+          <button class="contact-form__submit" type="submit" data-i18n="form.submit">
+            ${currentContent.contact.form.submit}
+          </button>
         </form>
 
         <p class="contact__status" role="status" aria-live="polite"></p>
@@ -82,9 +150,174 @@ app.innerHTML = `
   </div>
 `;
 
-const form = app.querySelector<HTMLFormElement>(".contact-form");
+const site = app.querySelector<HTMLDivElement>(".site");
+const sidebar = app.querySelector<HTMLElement>("#primary-sidebar");
+const scrollButton = app.querySelector<HTMLButtonElement>(".header-scroll");
+const overlayButton = app.querySelector<HTMLButtonElement>(".sidebar__overlay");
+const navElement = app.querySelector<HTMLElement>(".sidebar__nav");
+const navLinks = Array.from(app.querySelectorAll<HTMLAnchorElement>(".sidebar__nav a"));
+const navHomeLink = app.querySelector<HTMLAnchorElement>('[data-i18n="nav.home"]');
+const navContactLink = app.querySelector<HTMLAnchorElement>('[data-i18n="nav.contact"]');
+const languageLabel = app.querySelector<HTMLLabelElement>('[data-i18n="language.label"]');
+const languageSelect = app.querySelector<HTMLSelectElement>("#language-picker");
+const contactTagline = app.querySelector<HTMLParagraphElement>('[data-i18n="contact.tagline"]');
+const contactHeading = app.querySelector<HTMLHeadingElement>('[data-i18n="contact.heading"]');
+const contactIntro = app.querySelector<HTMLParagraphElement>('[data-i18n="contact.intro"]');
+const formNameLabel = app.querySelector<HTMLSpanElement>('[data-i18n="form.nameLabel"]');
+const formEmailLabel = app.querySelector<HTMLSpanElement>('[data-i18n="form.emailLabel"]');
+const formCategoryLabel = app.querySelector<HTMLSpanElement>('[data-i18n="form.categoryLabel"]');
+const formMessageLabel = app.querySelector<HTMLSpanElement>('[data-i18n="form.messageLabel"]');
+const formElement = app.querySelector<HTMLFormElement>(".contact-form");
 const contactCard = app.querySelector<HTMLDivElement>(".contact__card");
 const statusBanner = app.querySelector<HTMLParagraphElement>(".contact__status");
+const nameInput = formElement?.querySelector<HTMLInputElement>('input[name="fullName"]');
+const emailInput = formElement?.querySelector<HTMLInputElement>('input[name="email"]');
+const messageInput = formElement?.querySelector<HTMLTextAreaElement>('textarea[name="message"]');
+const submitButton = formElement?.querySelector<HTMLButtonElement>('[data-i18n="form.submit"]');
+
+const setActiveNav = (route: "home" | "contact") => {
+  navLinks.forEach((link) => {
+    const isActive = link.dataset.route === route;
+    link.classList.toggle("sidebar__nav-link--active", isActive);
+    if (isActive) {
+      link.setAttribute("aria-current", "page");
+    } else {
+      link.removeAttribute("aria-current");
+    }
+  });
+};
+
+const setSidebarState = (open: boolean) => {
+  if (!site || !sidebar || !scrollButton) {
+    return;
+  }
+
+  site.classList.toggle("site--sidebar-open", open);
+  sidebar.setAttribute("aria-hidden", String(!open));
+  scrollButton.setAttribute("aria-expanded", String(open));
+  document.body.classList.toggle("no-scroll", open);
+};
+
+const toggleSidebar = () => {
+  const isOpen = site?.classList.contains("site--sidebar-open") ?? false;
+  setSidebarState(!isOpen);
+};
+
+if (scrollButton) {
+  scrollButton.addEventListener("click", toggleSidebar);
+}
+
+if (overlayButton) {
+  overlayButton.addEventListener("click", () => setSidebarState(false));
+}
+
+navLinks.forEach((link) => {
+  link.addEventListener("click", () => setSidebarState(false));
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") {
+    setSidebarState(false);
+  }
+});
+
+setActiveNav("contact");
+
+const applyLanguageToUI = (language: LanguageCode) => {
+  currentContent = getContent(language);
+
+  if (navElement) {
+    navElement.setAttribute("aria-label", currentContent.aria.nav);
+  }
+
+  if (scrollButton) {
+    scrollButton.setAttribute("aria-label", currentContent.aria.headerButton);
+  }
+
+  if (overlayButton) {
+    overlayButton.setAttribute("aria-label", currentContent.aria.closeNavigation);
+  }
+
+  if (navHomeLink) {
+    navHomeLink.textContent = currentContent.navigation.home;
+  }
+
+  if (navContactLink) {
+    navContactLink.textContent = currentContent.navigation.contact;
+  }
+
+  if (languageLabel) {
+    languageLabel.textContent = currentContent.language.label;
+  }
+
+  if (languageSelect) {
+    languageSelect.value = language;
+    languageSelect.setAttribute("aria-label", currentContent.language.label);
+    LANGUAGE_OPTIONS.forEach((option, index) => {
+      if (languageSelect.options[index]) {
+        languageSelect.options[index].textContent = option.flag;
+      }
+    });
+  }
+
+  if (contactTagline) {
+    contactTagline.textContent = currentContent.tagline;
+  }
+
+  if (contactHeading) {
+    contactHeading.textContent = currentContent.contact.heading;
+  }
+
+  if (contactIntro) {
+    contactIntro.textContent = currentContent.contact.intro;
+  }
+
+  if (formNameLabel) {
+    formNameLabel.textContent = currentContent.contact.form.nameLabel;
+  }
+
+  if (nameInput) {
+    nameInput.placeholder = currentContent.contact.form.namePlaceholder;
+  }
+
+  if (formEmailLabel) {
+    formEmailLabel.textContent = currentContent.contact.form.emailLabel;
+  }
+
+  if (emailInput) {
+    emailInput.placeholder = currentContent.contact.form.emailPlaceholder;
+  }
+
+  if (formCategoryLabel) {
+    formCategoryLabel.textContent = currentContent.contact.form.categoryLabel;
+  }
+
+  if (formMessageLabel) {
+    formMessageLabel.textContent = currentContent.contact.form.messageLabel;
+  }
+
+  if (messageInput) {
+    messageInput.placeholder = currentContent.contact.form.messagePlaceholder;
+  }
+
+  if (submitButton) {
+    submitButton.textContent = currentContent.contact.form.submit;
+  }
+};
+
+if (languageSelect) {
+  languageSelect.addEventListener("change", (event) => {
+    const selected = (event.target as HTMLSelectElement).value;
+
+    if (!isLanguageCode(selected)) {
+      return;
+    }
+
+    currentLanguage = selected;
+    storeLanguagePreference(selected);
+    applyLanguageToUI(selected);
+  });
+}
 
 if (contactCard) {
   const handlePointer = (event: PointerEvent) => {
@@ -105,20 +338,18 @@ if (contactCard) {
   });
 }
 
-if (form && statusBanner) {
-  const submitButton = form.querySelector<HTMLButtonElement>(".contact-form__submit");
-
-  form.addEventListener("submit", async (event) => {
+if (formElement && statusBanner) {
+  formElement.addEventListener("submit", async (event) => {
     event.preventDefault();
 
-    const formData = new FormData(form);
+    const formData = new FormData(formElement);
     const senderName = (formData.get("fullName") as string)?.trim() ?? "";
     const senderEmail = (formData.get("email") as string)?.trim() ?? "";
     const category = (formData.get("category") as string)?.trim() ?? CONTACT_CATEGORIES[0];
     const message = (formData.get("message") as string)?.trim() ?? "";
 
     if (!senderName || !senderEmail || !message) {
-      form.reportValidity();
+      formElement.reportValidity();
       return;
     }
 
@@ -127,7 +358,7 @@ if (form && statusBanner) {
 
     if (submitButton) {
       submitButton.disabled = true;
-      submitButton.textContent = "Sending...";
+      submitButton.textContent = currentContent.contact.form.sending;
     }
 
     try {
@@ -148,12 +379,12 @@ if (form && statusBanner) {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to send message. Please try again.");
+        throw new Error(currentContent.contact.form.errorRequest);
       }
 
       statusBanner.dataset.state = "success";
-      statusBanner.textContent = "Message sent! Redirecting...";
-      form.reset();
+      statusBanner.textContent = currentContent.contact.form.success;
+      formElement.reset();
 
       window.setTimeout(() => {
         window.location.href = "./contact-success.html";
@@ -162,12 +393,12 @@ if (form && statusBanner) {
       statusBanner.textContent =
         error instanceof Error
           ? error.message
-          : "Something went wrong while sending your message. Please retry.";
+          : currentContent.contact.form.errorUnknown;
       statusBanner.dataset.state = "error";
     } finally {
       if (submitButton) {
         submitButton.disabled = false;
-        submitButton.textContent = "Send message";
+        submitButton.textContent = currentContent.contact.form.submit;
       }
     }
   });

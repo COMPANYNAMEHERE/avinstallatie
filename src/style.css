@@ -76,7 +76,7 @@ body.no-scroll {
   gap: clamp(1.2rem, 2vw, 1.6rem);
 }
 
-.sidebar__nav a {
+.sidebar__nav-link {
   font-size: 1.05rem;
   font-weight: 500;
   color: var(--heading);
@@ -86,9 +86,53 @@ body.no-scroll {
   transition: color 160ms ease;
 }
 
-.sidebar__nav a:hover,
-.sidebar__nav a:focus-visible {
+.sidebar__nav-link:hover,
+.sidebar__nav-link:focus-visible {
   color: var(--accent);
+}
+
+.sidebar__nav-link--active {
+  font-size: 1.22rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+}
+
+.sidebar__language {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.sidebar__language-label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: rgba(20, 20, 20, 0.8);
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+
+.language-picker__select {
+  border: none;
+  background: rgba(255, 255, 255, 0.9);
+  font-size: 1.2rem;
+  padding: 0.25rem 0.85rem 0.25rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+  font-weight: 500;
+  color: var(--heading);
+  appearance: none;
+  min-width: 3.5rem;
+  text-align: center;
+}
+
+.language-picker__select:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px rgba(0, 0, 0, 0.2),
+    0 8px 18px rgba(0, 0, 0, 0.08);
 }
 
 .sidebar__overlay {
@@ -285,9 +329,7 @@ body.no-scroll {
   align-items: center;
   justify-content: center;
   padding: clamp(3.5rem, 6vw, 5rem) clamp(1.5rem, 6vw, 4rem);
-  background:
-    radial-gradient(circle at top, rgba(215, 215, 215, 0.35), transparent 60%),
-    linear-gradient(180deg, rgba(251, 251, 251, 0.96), rgba(240, 240, 240, 0.9));
+  background: var(--background);
 }
 
 .contact__card {
