@@ -16,7 +16,6 @@ app.innerHTML = `
     <aside id="primary-sidebar" class="sidebar" aria-hidden="true">
       <nav class="sidebar__nav" aria-label="Primary navigation">
         <a href="${basePath}#home">Homepage</a>
-        <a href="${basePath}#projects">Projects</a>
         <a href="${basePath}contact.html">Contact</a>
       </nav>
     </aside>
@@ -105,17 +104,21 @@ if (scrollButton) {
 
 const DRAG_OPEN_THRESHOLD = 90;
 const MAX_DRAG_DISTANCE = 150;
+const MAX_VERTICAL_DRAG = 45;
 let dragStartX = 0;
+let dragStartY = 0;
 let dragPointerId: number | null = null;
 let isDraggingScroll = false;
-let dragOffset = 0;
+let dragOffsetX = 0;
+let dragOffsetY = 0;
 
-const setDragOffset = (value: number) => {
+const setDragOffset = (x: number, y: number) => {
   if (!scrollButton) {
     return;
   }
 
-  scrollButton.style.setProperty("--drag-offset", `${value}px`);
+  scrollButton.style.setProperty("--drag-offset-x", `${x}px`);
+  scrollButton.style.setProperty("--drag-offset-y", `${y}px`);
 };
 
 const resetDragState = () => {
@@ -124,7 +127,8 @@ const resetDragState = () => {
   }
 
   const pointerId = dragPointerId;
-  dragOffset = 0;
+  dragOffsetX = 0;
+  dragOffsetY = 0;
   isDraggingScroll = false;
   dragPointerId = null;
   scrollButton.classList.remove("header-scroll--dragging");
@@ -133,7 +137,7 @@ const resetDragState = () => {
     scrollButton.releasePointerCapture(pointerId);
   }
 
-  setDragOffset(0);
+  setDragOffset(0, 0);
 };
 
 const handleDragEnd = (event: PointerEvent) => {
@@ -145,8 +149,8 @@ const handleDragEnd = (event: PointerEvent) => {
     return;
   }
 
-  const didMove = dragOffset > 6;
-  const shouldOpen = dragOffset >= DRAG_OPEN_THRESHOLD;
+  const didMove = dragOffsetX > 6 || Math.abs(dragOffsetY) > 6;
+  const shouldOpen = dragOffsetX >= DRAG_OPEN_THRESHOLD;
 
   resetDragState();
 
@@ -173,8 +177,10 @@ if (scrollButton) {
 
     isDraggingScroll = true;
     dragStartX = event.clientX;
+    dragStartY = event.clientY;
     dragPointerId = event.pointerId;
-    dragOffset = 0;
+    dragOffsetX = 0;
+    dragOffsetY = 0;
     scrollButton.classList.add("header-scroll--dragging");
     scrollButton.setPointerCapture(event.pointerId);
     if (event.pointerType !== "mouse") {
@@ -188,8 +194,13 @@ if (scrollButton) {
     }
 
     const deltaX = Math.max(0, event.clientX - dragStartX);
-    dragOffset = Math.min(MAX_DRAG_DISTANCE, deltaX);
-    setDragOffset(dragOffset);
+    const deltaY = event.clientY - dragStartY;
+    dragOffsetX = Math.min(MAX_DRAG_DISTANCE, deltaX);
+    dragOffsetY = Math.max(
+      -MAX_VERTICAL_DRAG,
+      Math.min(MAX_VERTICAL_DRAG, deltaY)
+    );
+    setDragOffset(dragOffsetX, dragOffsetY);
   });
 
   scrollButton.addEventListener("pointerup", handleDragEnd);
