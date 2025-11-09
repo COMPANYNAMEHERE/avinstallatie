@@ -8,7 +8,14 @@ import {
   storeLanguagePreference,
   isLanguageCode
 } from "./content";
-import { CONTACT_CATEGORIES, CONTACT_ENDPOINT } from "./config";
+import {
+  CONTACT_CATEGORIES,
+  EMAILJS_PUBLIC_KEY,
+  EMAILJS_SERVICE_ID,
+  EMAILJS_TEMPLATE_ID,
+  hasEmailJsConfig
+} from "./config";
+import { send as sendEmail } from "@emailjs/browser";
 
 const rawBase = import.meta.env.BASE_URL ?? "/";
 const basePath = rawBase.endsWith("/") ? rawBase : `${rawBase}/`;
@@ -175,7 +182,9 @@ const emailInput = formElement?.querySelector<HTMLInputElement>('input[name="ema
 const messageInput = formElement?.querySelector<HTMLTextAreaElement>('textarea[name="message"]');
 const submitButton = formElement?.querySelector<HTMLButtonElement>('[data-i18n="form.submit"]');
 
-const setActiveNav = (route: "home" | "contact") => {
+type RouteKey = "home" | "contact";
+
+const setActiveNav = (route: RouteKey) => {
   navLinks.forEach((link) => {
     const isActive = link.dataset.route === route;
     link.classList.toggle("sidebar__nav-link--active", isActive);
@@ -203,8 +212,142 @@ const toggleSidebar = () => {
   setSidebarState(!isOpen);
 };
 
+let skipNextScrollClick = false;
+let skipClickResetTimer: ReturnType<typeof setTimeout> | null = null;
+
+const scheduleSkipClickReset = () => {
+  if (skipClickResetTimer) {
+    window.clearTimeout(skipClickResetTimer);
+  }
+
+  skipClickResetTimer = window.setTimeout(() => {
+    skipNextScrollClick = false;
+    skipClickResetTimer = null;
+  }, 300);
+};
+
 if (scrollButton) {
-  scrollButton.addEventListener("click", toggleSidebar);
+  scrollButton.addEventListener("click", (event) => {
+    if (skipNextScrollClick) {
+      event.preventDefault();
+      event.stopPropagation();
+      skipNextScrollClick = false;
+      if (skipClickResetTimer) {
+        window.clearTimeout(skipClickResetTimer);
+        skipClickResetTimer = null;
+      }
+      return;
+    }
+
+    toggleSidebar();
+  });
+}
+
+const DRAG_OPEN_THRESHOLD = 90;
+const MAX_DRAG_DISTANCE = 150;
+const MAX_VERTICAL_DRAG = 45;
+let dragStartX = 0;
+let dragStartY = 0;
+let dragPointerId: number | null = null;
+let isDraggingScroll = false;
+let dragOffsetX = 0;
+let dragOffsetY = 0;
+
+const setDragOffset = (x: number, y: number) => {
+  if (!scrollButton) {
+    return;
+  }
+
+  scrollButton.style.setProperty("--drag-offset-x", `${x}px`);
+  scrollButton.style.setProperty("--drag-offset-y", `${y}px`);
+};
+
+const resetDragState = () => {
+  if (!scrollButton) {
+    return;
+  }
+
+  const pointerId = dragPointerId;
+  dragOffsetX = 0;
+  dragOffsetY = 0;
+  isDraggingScroll = false;
+  dragPointerId = null;
+  scrollButton.classList.remove("header-scroll--dragging");
+
+  if (typeof pointerId === "number" && scrollButton.hasPointerCapture(pointerId)) {
+    scrollButton.releasePointerCapture(pointerId);
+  }
+
+  setDragOffset(0, 0);
+};
+
+const handleDragEnd = (event: PointerEvent) => {
+  if (!scrollButton || !isDraggingScroll || event.pointerId !== dragPointerId) {
+    return;
+  }
+
+  const didMove = dragOffsetX > 6 || Math.abs(dragOffsetY) > 6;
+  const shouldOpen = dragOffsetX >= DRAG_OPEN_THRESHOLD;
+
+  resetDragState();
+
+  if (didMove) {
+    skipNextScrollClick = true;
+    scheduleSkipClickReset();
+  }
+
+  if (shouldOpen) {
+    setSidebarState(true);
+  } else if (didMove) {
+    setSidebarState(false);
+  }
+};
+
+if (scrollButton) {
+  scrollButton.addEventListener("pointerdown", (event) => {
+    if (
+      (event.pointerType === "mouse" && event.button !== 0) ||
+      site?.classList.contains("site--sidebar-open")
+    ) {
+      return;
+    }
+
+    isDraggingScroll = true;
+    dragStartX = event.clientX;
+    dragStartY = event.clientY;
+    dragPointerId = event.pointerId;
+    dragOffsetX = 0;
+    dragOffsetY = 0;
+    scrollButton.classList.add("header-scroll--dragging");
+    scrollButton.setPointerCapture(event.pointerId);
+    if (event.pointerType !== "mouse") {
+      event.preventDefault();
+    }
+  });
+
+  scrollButton.addEventListener("pointermove", (event) => {
+    if (!isDraggingScroll || event.pointerId !== dragPointerId) {
+      return;
+    }
+
+    const deltaX = Math.max(0, event.clientX - dragStartX);
+    const deltaY = event.clientY - dragStartY;
+    dragOffsetX = Math.min(MAX_DRAG_DISTANCE, deltaX);
+    dragOffsetY = Math.max(-MAX_VERTICAL_DRAG, Math.min(MAX_VERTICAL_DRAG, deltaY));
+    setDragOffset(dragOffsetX, dragOffsetY);
+  });
+
+  scrollButton.addEventListener("pointerup", handleDragEnd);
+  scrollButton.addEventListener("pointercancel", handleDragEnd);
+  scrollButton.addEventListener("lostpointercapture", () => {
+    if (!isDraggingScroll) {
+      return;
+    }
+
+    resetDragState();
+    skipNextScrollClick = true;
+    scheduleSkipClickReset();
+  });
 }
 
 if (overlayButton) {
@@ -362,25 +505,24 @@ if (formElement && statusBanner) {
     }
 
     try {
-      const response = await fetch(CONTACT_ENDPOINT, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json"
-        },
-        body: JSON.stringify({
-          name: senderName,
-          email: senderEmail,
-          message,
-          category,
-          _subject: `AV enquiry (${category}) from ${senderName}`,
-          _template: "table"
-        })
-      });
-
-      if (!response.ok) {
+      if (!hasEmailJsConfig) {
         throw new Error(currentContent.contact.form.errorRequest);
       }
+
+      await sendEmail(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_TEMPLATE_ID,
+        {
+          fullName: senderName,
+          replyTo: senderEmail,
+          category,
+          message,
+          subject: `AV enquiry (${category}) from ${senderName}`
+        },
+        {
+          publicKey: EMAILJS_PUBLIC_KEY
+        }
+      );
 
       statusBanner.dataset.state = "success";
       statusBanner.textContent = currentContent.contact.form.success;
