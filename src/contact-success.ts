@@ -45,7 +45,7 @@ if (countdownRef) {
 
     if (secondsRemaining <= 0) {
       window.clearInterval(timer);
-      window.location.href = "./contact.html";
+      window.location.href = `${basePath}contact.html`;
     }
   }, 1000);
 }

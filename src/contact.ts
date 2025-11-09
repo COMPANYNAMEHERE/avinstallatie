@@ -529,7 +529,7 @@ if (formElement && statusBanner) {
       formElement.reset();
 
       window.setTimeout(() => {
-        window.location.href = "./contact-success.html";
+        window.location.href = `${basePath}contact-success.html`;
       }, 600);
     } catch (error) {
       statusBanner.textContent =
