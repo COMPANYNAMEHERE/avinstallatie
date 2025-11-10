@@ -143,6 +143,40 @@ const toggleSidebar = () => {
   setSidebarState(!isOpen);
 };
 
+const DESKTOP_BREAKPOINT = 900;
+const HEADER_TRANSITION_CLASS = "site--transitioning";
+let headerTransitionTimer: ReturnType<typeof setTimeout> | null = null;
+
+const isDesktopViewport = () => {
+  return window.matchMedia(`(min-width: ${DESKTOP_BREAKPOINT}px)`).matches;
+};
+
+const isPageNavigation = (link: HTMLAnchorElement) => {
+  try {
+    const linkUrl = new URL(link.href);
+    return linkUrl.pathname !== window.location.pathname;
+  } catch {
+    return false;
+  }
+};
+
+const startHeaderRetraction = () => {
+  if (!site || !isDesktopViewport()) {
+    return;
+  }
+
+  site.classList.add(HEADER_TRANSITION_CLASS);
+
+  if (headerTransitionTimer) {
+    window.clearTimeout(headerTransitionTimer);
+  }
+
+  headerTransitionTimer = window.setTimeout(() => {
+    site.classList.remove(HEADER_TRANSITION_CLASS);
+    headerTransitionTimer = null;
+  }, 320);
+};
+
 let skipNextScrollClick = false;
 let skipClickResetTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -295,7 +329,12 @@ if (overlayButton) {
 setActiveNav("home");
 
 navLinks.forEach((link) => {
-  link.addEventListener("click", () => setSidebarState(false));
+  link.addEventListener("click", () => {
+    setSidebarState(false);
+    if (isPageNavigation(link)) {
+      startHeaderRetraction();
+    }
+  });
 });
 
 document.addEventListener("keydown", (event) => {
