@@ -1,6 +1,6 @@
-import heroImageUrl from "../assets/av-installatie-transparent.png";
-import enContent from "./content.en";
-import nlContent from "./content.nl";
+import heroImageUrl from "../../assets/av-installatie-transparent.png";
+import enContent from "./en";
+import nlContent from "./nl";
 
 export const backgroundImage = heroImageUrl;
 

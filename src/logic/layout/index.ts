@@ -1,5 +1,5 @@
-import type { LanguageCode, LocalizedContent } from "./content";
-import { isLanguageCode, LANGUAGE_OPTIONS } from "./content";
+import type { LanguageCode, LocalizedContent } from "../../content";
+import { isLanguageCode, LANGUAGE_OPTIONS } from "../../content";
 
 export type LayoutRoute = "home" | "contact";
 

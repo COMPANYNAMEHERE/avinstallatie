@@ -1,5 +1,5 @@
-import headerButtonSrc from "../assets/headerbutton-transparent.png";
-import "./style.css";
+import headerButtonSrc from "../../assets/headerbutton-transparent.png";
+import "../styles/main.css";
 import {
   backgroundImage,
   localizedContent,
@@ -7,14 +7,14 @@ import {
   storeLanguagePreference,
   type LanguageCode,
   type LocalizedContent
-} from "./content";
+} from "../content";
 import {
   initLayout,
   layoutMarkup,
   type LayoutControls,
   type LayoutRoute
-} from "./layout";
-import { mountHomePage, mountContactPage } from "./pages";
+} from "../logic/layout";
+import { mountHomePage, mountContactPage } from "../logic/views";
 
 const rawBase = import.meta.env.BASE_URL ?? "/";
 const basePath = rawBase.endsWith("/") ? rawBase : `${rawBase}/`;

@@ -1,5 +1,5 @@
-import headerButtonSrc from "../assets/headerbutton-transparent.png";
-import "./style.css";
+import headerButtonSrc from "../../assets/headerbutton-transparent.png";
+import "../styles/main.css";
 
 const rawBase = import.meta.env.BASE_URL ?? "/";
 const basePath = rawBase.endsWith("/") ? rawBase : `${rawBase}/`;

@@ -1,14 +1,14 @@
-import headerButtonSrc from "../assets/headerbutton-transparent.png";
-import "./style.css";
+import headerButtonSrc from "../../assets/headerbutton-transparent.png";
+import "../styles/main.css";
 import {
   localizedContent,
   resolveInitialLanguage,
   storeLanguagePreference,
   type LanguageCode,
   type LocalizedContent
-} from "./content";
-import { layoutMarkup, initLayout, type LayoutControls } from "./layout";
-import { mountContactPage } from "./pages";
+} from "../content";
+import { layoutMarkup, initLayout, type LayoutControls } from "../logic/layout";
+import { mountContactPage } from "../logic/views";
 
 const rawBase = import.meta.env.BASE_URL ?? "/";
 const basePath = rawBase.endsWith("/") ? rawBase : `${rawBase}/`;

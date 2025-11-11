@@ -4,9 +4,9 @@ import {
   EMAILJS_SERVICE_ID,
   EMAILJS_TEMPLATE_ID,
   hasEmailJsConfig
-} from "./config";
+} from "../../config";
 import { send as sendEmail } from "@emailjs/browser";
-import type { LocalizedContent } from "./content";
+import type { LocalizedContent } from "../../content";
 
 interface MountHomeOptions {
   container: HTMLElement;
@@ -103,7 +103,6 @@ export const mountContactPage = ({ container, content, basePath }: MountContactO
   container.innerHTML = `
     <section class="contact__card" aria-live="polite">
       <div class="contact__intro">
-        <p class="contact__tagline" data-i18n="contact.tagline">${content.tagline}</p>
         <h1 id="contact-title" data-i18n="contact.heading">${content.contact.heading}</h1>
         <p class="contact__subtext" data-i18n="contact.intro">
           ${content.contact.intro}
