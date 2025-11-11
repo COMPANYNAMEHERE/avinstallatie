@@ -8,6 +8,7 @@ import {
 } from "../../config";
 import { send as sendEmail } from "@emailjs/browser";
 import type { LocalizedContent } from "../../content";
+import notepadGraphic from "../../../assets/contactsnotepad.png";
 
 interface MountHomeOptions {
   container: HTMLElement;
@@ -98,72 +99,76 @@ const resetFormState = (submitButton: HTMLButtonElement | null, statusBanner: HT
 };
 
 export const mountContactPage = ({ container, content, basePath }: MountContactOptions) => {
-  container.className = "contact";
+  const obfuscatedEmail = getObfuscatedContactEmail();
+  container.className = "contact contact--notepad";
   container.setAttribute("role", "main");
   container.removeAttribute("id");
   container.innerHTML = `
-    <section class="contact__card" aria-live="polite">
-      <div class="contact__intro">
-        <h1 id="contact-title" data-i18n="contact.heading">${content.contact.heading}</h1>
-        <p class="contact__subtext" data-i18n="contact.intro">
-          ${content.contact.intro}
-        </p>
+    <div class="contact__notepad" aria-live="polite" style="--notepad-bg: url('${notepadGraphic}');">
+      <div class="contact__note-content">
+        <div class="contact__intro">
+          <h1 id="contact-title" data-i18n="contact.heading">${content.contact.heading}</h1>
+          <p class="contact__subtext" data-i18n="contact.intro">
+            ${content.contact.intro}
+          </p>
+        </div>
+
+        <form class="contact-form" autocomplete="on" novalidate>
+          <label class="field">
+            <span class="field__label" data-i18n="form.nameLabel">${content.contact.form.nameLabel}</span>
+            <input
+              class="field__control"
+              type="text"
+              name="fullName"
+              required
+              placeholder="${content.contact.form.namePlaceholder}"
+            />
+          </label>
+
+          <label class="field">
+            <span class="field__label" data-i18n="form.emailLabel">${content.contact.form.emailLabel}</span>
+            <input
+              class="field__control"
+              type="email"
+              name="email"
+              required
+              inputmode="email"
+              placeholder="${obfuscatedEmail}"
+            />
+          </label>
+
+          <label class="field">
+            <span class="field__label" data-i18n="form.categoryLabel">${content.contact.form.categoryLabel}</span>
+            <select class="field__control" name="category" required>
+              ${renderCategoryOptions()}
+            </select>
+          </label>
+
+          <label class="field field--area">
+            <span class="field__label" data-i18n="form.messageLabel">${content.contact.form.messageLabel}</span>
+            <textarea
+              class="field__control field__control--area"
+              name="message"
+              rows="6"
+              required
+              placeholder="${content.contact.form.messagePlaceholder}"
+            ></textarea>
+          </label>
+
+          <button class="contact-form__submit" type="submit" data-i18n="form.submit">
+            ${content.contact.form.submit}
+          </button>
+        </form>
+
+        <p class="contact__note-footnote">Prefer to email? Use <span>${obfuscatedEmail}</span></p>
+        <p class="contact__status" role="status" aria-live="polite"></p>
       </div>
-
-      <form class="contact-form" autocomplete="on" novalidate>
-        <label class="field">
-          <span class="field__label" data-i18n="form.nameLabel">${content.contact.form.nameLabel}</span>
-          <input
-            class="field__control"
-            type="text"
-            name="fullName"
-            required
-            placeholder="${content.contact.form.namePlaceholder}"
-          />
-        </label>
-
-        <label class="field">
-          <span class="field__label" data-i18n="form.emailLabel">${content.contact.form.emailLabel}</span>
-          <input
-            class="field__control"
-            type="email"
-            name="email"
-            required
-            inputmode="email"
-            placeholder="${content.contact.form.emailPlaceholder}"
-          />
-        </label>
-
-        <label class="field">
-          <span class="field__label" data-i18n="form.categoryLabel">${content.contact.form.categoryLabel}</span>
-          <select class="field__control" name="category" required>
-            ${renderCategoryOptions()}
-          </select>
-        </label>
-
-        <label class="field field--area">
-          <span class="field__label" data-i18n="form.messageLabel">${content.contact.form.messageLabel}</span>
-          <textarea
-            class="field__control field__control--area"
-            name="message"
-            rows="6"
-            required
-            placeholder="${content.contact.form.messagePlaceholder}"
-          ></textarea>
-        </label>
-
-        <button class="contact-form__submit" type="submit" data-i18n="form.submit">
-          ${content.contact.form.submit}
-        </button>
-      </form>
-
-      <p class="contact__status" role="status" aria-live="polite"></p>
-    </section>
+    </div>
   `;
 
-  const contactCard = container.querySelector<HTMLElement>(".contact__card");
-  if (contactCard) {
-    setupContactGlows(contactCard);
+  const notePad = container.querySelector<HTMLElement>(".contact__notepad");
+  if (notePad) {
+    setupContactGlows(notePad);
   }
 
   const formElement = container.querySelector<HTMLFormElement>(".contact-form");
@@ -175,11 +180,6 @@ export const mountContactPage = ({ container, content, basePath }: MountContactO
 
   if (!formElement || !statusBanner) {
     return;
-  }
-
-  const obfuscatedEmail = getObfuscatedContactEmail();
-  if (emailInput) {
-    emailInput.placeholder = obfuscatedEmail;
   }
 
   formElement.addEventListener("submit", async (event) => {

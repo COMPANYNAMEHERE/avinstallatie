@@ -1,0 +1,122 @@
+@import url("https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap");
+
+.contact--notepad {
+  background:
+    radial-gradient(circle at 18% 22%, rgba(255, 222, 145, 0.25), transparent 58%),
+    radial-gradient(circle at 78% 12%, rgba(255, 255, 255, 0.5), transparent 60%),
+    #f3f3f3;
+  padding-top: 0;
+  align-items: flex-start;
+  font-family: "Patrick Hand", "Inter", sans-serif;
+}
+
+.contact.contact--notepad {
+  padding: 2vh 5vw 4vh;
+  align-items: flex-start;
+}
+
+.contact__notepad {
+  position: relative;
+  width: min(99vw, 100%);
+  max-width: none;
+  aspect-ratio: 5 / 8;
+  background-image: var(--notepad-bg);
+  background-size: cover;
+  background-position: center top;
+  filter: drop-shadow(0 32px 38px rgba(0, 0, 0, 0.28));
+  padding: clamp(2rem, 5vw, 3rem) clamp(2rem, 4vw, 3rem) clamp(2rem, 4vw, 3rem);
+  display: flex;
+  align-items: stretch;
+  justify-content: flex-start;
+  overflow: hidden;
+  margin: calc(10vh + 2vmin) 5vw 0;
+}
+
+.contact__note-content {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: clamp(1.1rem, 1.8vw, 1.6rem);
+  padding-top: clamp(8rem, 18vw, 11rem);
+  justify-content: flex-start;
+}
+
+.contact--notepad .contact__intro {
+  text-align: left;
+  gap: 0.35rem;
+}
+
+.contact--notepad .contact__tagline {
+  font-size: 0.72rem;
+  color: rgba(0, 0, 0, 0.55);
+}
+
+.contact--notepad .contact__intro h1 {
+  font-size: clamp(2rem, 4vw, 2.5rem);
+  color: #1f1f1f;
+  letter-spacing: -0.02em;
+}
+
+.contact--notepad .contact__subtext {
+  font-size: 1rem;
+  color: rgba(30, 30, 30, 0.78);
+}
+
+.contact--notepad .field__label {
+  font-size: 0.9rem;
+  letter-spacing: 0.08em;
+  color: rgba(45, 35, 5, 0.8);
+}
+
+.contact--notepad .field__control {
+  border: none;
+  border-bottom: 2px solid rgba(60, 40, 10, 0.4);
+  border-radius: 0;
+  background: transparent;
+  padding: 0.5rem 0;
+  font-family: "Patrick Hand", "Inter", sans-serif;
+  font-size: 1.05rem;
+  color: #1d1d1d;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.contact--notepad .field__control:focus,
+.contact--notepad .field__control:hover {
+  border-color: rgba(60, 40, 10, 0.8);
+  box-shadow: inset 0 -8px 0 rgba(255, 235, 180, 0.45);
+  outline: none;
+}
+
+.contact--notepad .field__control--area {
+  min-height: 8rem;
+  resize: none;
+  line-height: 1.6;
+  background-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 1.5rem,
+    rgba(60, 40, 10, 0.12) 1.5rem,
+    rgba(60, 40, 10, 0.12) 1.6rem
+  );
+  background-size: 100% 1.6rem;
+}
+
+.contact__note-footnote {
+  margin: 0;
+  font-size: 0.78rem;
+  text-align: center;
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.contact__note-footnote span {
+  font-weight: 600;
+  color: #1f1f1f;
+}
+
+.contact--notepad .contact-form__submit {
+  align-self: center;
+  font-family: "Patrick Hand", "Inter", sans-serif;
+  letter-spacing: 0.06em;
+}

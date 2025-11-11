@@ -1,5 +1,6 @@
 import headerButtonSrc from "../../assets/headerbutton-transparent.png";
 import "../styles/main.css";
+import "../styles/contact.css";
 import {
   localizedContent,
   resolveInitialLanguage,
