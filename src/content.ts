@@ -9,6 +9,8 @@ export const localizedContent = {
   en: enContent
 } as const;
 
+export type LocalizedContent = (typeof localizedContent)[LanguageCode];
+
 export const SUPPORTED_LANGUAGES = Object.keys(localizedContent) as Array<
   keyof typeof localizedContent
 >;
