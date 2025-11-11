@@ -3,6 +3,7 @@ import {
   EMAILJS_PUBLIC_KEY,
   EMAILJS_SERVICE_ID,
   EMAILJS_TEMPLATE_ID,
+  getObfuscatedContactEmail,
   hasEmailJsConfig
 } from "../../config";
 import { send as sendEmail } from "@emailjs/browser";
@@ -174,6 +175,11 @@ export const mountContactPage = ({ container, content, basePath }: MountContactO
 
   if (!formElement || !statusBanner) {
     return;
+  }
+
+  const obfuscatedEmail = getObfuscatedContactEmail();
+  if (emailInput) {
+    emailInput.placeholder = obfuscatedEmail;
   }
 
   formElement.addEventListener("submit", async (event) => {
