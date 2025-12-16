@@ -3,6 +3,7 @@ import { extname, resolve } from "path";
 
 export default defineConfig({
   base: "/",
+  appType: "spa",
   build: {
     outDir: "dist",
     emptyOutDir: true,
