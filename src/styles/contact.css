@@ -77,6 +77,8 @@
   .contact__scroll-container {
     height: 100%;
     overflow-y: auto;
+    mask-image: linear-gradient(to bottom, black 90%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, black 90%, transparent 100%); /* For webkit browsers */
   }
 
   .contact.contact--notepad {
@@ -87,7 +89,7 @@
     margin: 5vh 5vw 6vh;
     width: min(95vw, 480px);
     aspect-ratio: 3 / 4;
-    padding: 15vw 1.5rem 22vw;
+    padding: 15vw 1.5rem 5vw; /* Adjusted bottom padding */
     min-height: 80vh;
   }
 
@@ -168,4 +170,27 @@
   align-self: center;
   font-family: "Patrick Hand", "Inter", sans-serif;
   letter-spacing: 0.06em;
+  /* New styles for visual feedback */
+  background-color: #f7e7c8;
+  border: 1px solid rgba(60, 40, 10, 0.4);
+  padding: 0.8em 1.5em;
+  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px; /* Organic rounded look */
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.1s ease-out, box-shadow 0.2s ease, background-color 0.2s ease;
+  will-change: transform;
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+.contact--notepad .contact-form__submit:hover {
+  background-color: #fff8e8; /* Brighter */
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15); /* Stronger shadow */
+  /* transform is handled by JS for the tilt effect, but we set a base scale here if JS isn't active or in addition */
+}
+
+.contact--notepad .contact-form__submit:active {
+  transform: scale(0.98) translateY(2px) !important; /* Force press down */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  background-color: #f0d5a4;
 }

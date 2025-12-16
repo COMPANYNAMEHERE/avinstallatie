@@ -1,0 +1,41 @@
+<svg width="200" height="600" viewBox="0 0 100 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="cableGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#222;stop-opacity:1" />
+      <stop offset="30%" style="stop-color:#555;stop-opacity:1" /> <stop offset="60%" style="stop-color:#111;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#000;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <g transform="translate(50, 0)">
+    
+    <path d="M -6,300 L -6,20 A 6,6 0 0 1 6,20 L 6,300" 
+          fill="url(#cableGradient)" 
+          stroke="black" 
+          stroke-width="2.5" />
+
+    <path d="M -8,300 L 8,300 L 10,312 L -10,312 Z" 
+          fill="white" 
+          stroke="black" 
+          stroke-width="2.5" />
+
+    <path d="M -15,312 Q -15,312 -15,325 Q -15,335 -15,335 L 15,335 Q 15,335 15,325 Q 15,312 15,312 Z" 
+          fill="white" 
+          stroke="black" 
+          stroke-width="2.5" />
+    
+    <rect x="-15" y="335" width="30" height="25" 
+          fill="white" 
+          stroke="black" 
+          stroke-width="2.5" />
+
+    <rect x="-10" y="360" width="20" height="20" 
+          fill="white" 
+          stroke="black" 
+          stroke-width="2.5" />
+
+    <path d="M -5,370 L -3,372 L -5,374 L -7,372 Z" fill="black" />
+    <path d="M 5,370 L 7,372 L 5,374 L 3,372 Z" fill="black" />
+    
+  </g>
+</svg>

@@ -1,0 +1,1 @@
+const a="/assets/img/av-installatie-transparent-BwaKmYVx.png",t={name:"Koert Manni",tagline:"AV Installatie",description:"Tailored audio-visual installations that blend seamlessly with every environment."},e=a;export{e as b,t as s};

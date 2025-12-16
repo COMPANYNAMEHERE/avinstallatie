@@ -156,6 +156,29 @@ const setupContactGlows = (card: HTMLElement) => {
   });
 };
 
+const setupButtonEffect = (button: HTMLButtonElement) => {
+  button.addEventListener("mousemove", (e) => {
+    const rect = button.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    // Calculate distance from center (-1 to 1)
+    const xPct = (x / rect.width - 0.5) * 2;
+    const yPct = (y / rect.height - 0.5) * 2;
+
+    // Tilt effect (max 15deg)
+    const rotateX = -yPct * 15;
+    const rotateY = xPct * 15;
+    
+    // Lift effect (translate Z)
+    button.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05) translateZ(10px)`;
+  });
+
+  button.addEventListener("mouseleave", () => {
+    button.style.transform = "perspective(1000px) rotateX(0) rotateY(0) scale(1) translateZ(0)";
+  });
+};
+
 export const mountHomePage = ({ container, content, backgroundImage }: MountHomeOptions) => {
   container.className = "landing";
   container.setAttribute("role", "main");
@@ -342,6 +365,11 @@ export const mountContactPage = ({ container, content, basePath }: MountContactO
   const formElement = container.querySelector<HTMLFormElement>(".contact-form");
   const statusBanner = container.querySelector<HTMLElement>(".contact__status");
   const submitButton = formElement?.querySelector<HTMLButtonElement>('[data-i18n="form.submit"]') ?? null;
+  
+  if (submitButton) {
+    setupButtonEffect(submitButton);
+  }
+
   const nameInput = formElement?.querySelector<HTMLInputElement>('input[name="fullName"]');
   const emailInput = formElement?.querySelector<HTMLInputElement>('input[name="email"]');
   const messageInput = formElement?.querySelector<HTMLTextAreaElement>('textarea[name="message"]');
