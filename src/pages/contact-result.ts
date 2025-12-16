@@ -1,5 +1,6 @@
 import headerButtonSrc from "../../assets/headerbutton-transparent.png";
 import "../styles/main.css";
+import { localizedContent, resolveInitialLanguage } from "../content";
 
 const rawBase = import.meta.env.BASE_URL ?? "/";
 const basePath = rawBase.endsWith("/") ? rawBase : `${rawBase}/`;
@@ -10,10 +11,25 @@ if (!app) {
   throw new Error("Root element #app not found");
 }
 
+// 1. Determine Language
+const lang = resolveInitialLanguage();
+const content = localizedContent[lang].resultPage;
+
+// 2. Determine Status
+const urlParams = new URLSearchParams(window.location.search);
+const status = urlParams.get("status");
+const isError = status === "error";
+
+const pageContent = isError ? content.error : content.success;
+const redirectTarget = isError ? `${basePath}contact` : basePath;
+
+// 3. Render
+document.title = `${pageContent.title} · ${localizedContent[lang].name}`;
+
 app.innerHTML = `
   <div class="site contact-page">
     <header class="site__header">
-      <a class="header-scroll header-scroll--link" href="${basePath}" aria-label="Return to homepage">
+      <a class="header-scroll header-scroll--link" href="${basePath}" aria-label="${localizedContent[lang].aria.returnHome}">
         <img src="${headerButtonSrc}" alt="" />
       </a>
     </header>
@@ -22,10 +38,10 @@ app.innerHTML = `
       <section class="contact__card contact__card--center">
         <div class="contact-thankyou contact-thankyou--standalone">
           <div class="contact-thankyou__content">
-            <h1>Message sent</h1>
-            <p>Thanks for reaching out. Koert will get back to you shortly.</p>
-            <p class="contact-thankyou__meta">Returning to the contact form in <span data-countdown>5</span> seconds…</p>
-            <a class="contact-form__submit contact-form__submit--link" href="${basePath}contact.html">Back to contact</a>
+            <h1>${pageContent.title}</h1>
+            <p>${pageContent.message}</p>
+            <p class="contact-thankyou__meta">${pageContent.redirect} <span data-countdown>5</span> ${content.seconds}</p>
+            <a class="contact-form__submit contact-form__submit--link" href="${redirectTarget}">${pageContent.button}</a>
           </div>
         </div>
       </section>
@@ -33,6 +49,7 @@ app.innerHTML = `
   </div>
 `;
 
+// 4. Countdown Logic
 const countdownRef = app.querySelector<HTMLElement>("[data-countdown]");
 
 if (countdownRef) {
@@ -45,7 +62,7 @@ if (countdownRef) {
 
     if (secondsRemaining <= 0) {
       window.clearInterval(timer);
-      window.location.href = `${basePath}contact.html`;
+      window.location.href = redirectTarget;
     }
   }, 1000);
 }

@@ -1,8 +1,17 @@
-import heroImageUrl from "../../assets/av-installatie-transparent.png";
+import heroImagePng from "../../assets/av-installatie-transparent-optimizedPNG.png";
+import heroImageWebp from "../../assets/av-installatie-transparent-optimizedWEBP.webp";
+import heroImageWebpLight from "../../assets/av-installatie-transparent-optimizedWEBPlight.webp";
 import enContent from "./en";
 import nlContent from "./nl";
 
-export const backgroundImage = heroImageUrl;
+const heroImageSources = {
+  png: heroImagePng,
+  webp: heroImageWebp,
+  webpLight: heroImageWebpLight
+} as const;
+
+export const backgroundImage = heroImageSources;
+export type HeroImageSources = typeof heroImageSources;
 
 export const localizedContent = {
   nl: nlContent,

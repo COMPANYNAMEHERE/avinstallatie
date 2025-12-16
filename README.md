@@ -1,17 +1,20 @@
 # AV Installatie Web App
 
 ## Overview
-This repository contains the source for the AV Installatie marketing site. The frontend is built with [Vite](https://vitejs.dev/) and vanilla TypeScript. Two entrypoints are provided:
+This repository contains the source for the AV Installatie marketing site. The frontend is built with [Vite](https://vitejs.dev/) and vanilla TypeScript.
 
-- `src/main.ts` renders the landing page experience, including the responsive sidebar navigation and hover interactions on the hero panel.
-- `src/contact.ts` powers the contact form page with dynamic validation messaging and EmailJS integration.
+The application is structured as a Single Page Application (SPA) for the main navigation, handling both the landing page and the contact form.
 
-Localized content is defined in `src/content.*.ts`, enabling runtime switching between supported languages. Shared configuration such as EmailJS identifiers and contact categories lives in `src/config.ts`.
+- `src/pages/home.ts` acts as the main entry point and router, managing the landing page and the contact view overlay.
+- `src/logic/views/index.ts` contains the rendering logic for the 3D hero scene and the contact form.
+
+Localized content is defined in `src/content/`, enabling runtime switching between supported languages. Shared configuration such as EmailJS identifiers and contact categories lives in `src/config/index.ts`.
 
 ## Key Runtime Behaviors
-- **Sidebar controller** – `src/main.ts` wires the header toggle button and pointer-drag gesture to the responsive sidebar navigation, updating ARIA attributes for accessibility.
-- **Language selection** – Both entrypoints read from `localizedContent` and persist user language choice via `storeLanguagePreference`, allowing consistent translations across pages.
-- **Contact form submission** – `src/contact.ts` validates required fields, toggles UI status messaging, and sends the payload through EmailJS when the required environment variables are configured.
+- **SPA Routing** – `src/pages/home.ts` handles client-side routing between the home view (`/`) and contact view (`/contact`).
+- **Interactive 3D Hero** – The landing page features a 3D-like interactive hero section powered by pointer events and device orientation (gyroscope).
+- **Language selection** – Reads from `localizedContent` and persists user language choice via `localStorage`.
+- **Contact form submission** – Validates required fields, toggles UI status messaging, and sends the payload through EmailJS.
 
 ## Development
 
@@ -56,13 +59,12 @@ Without these values, the contact form will remain in a disabled state to preven
 ├── assets/                 # Static images referenced by the UI
 ├── public/                 # Static assets copied as-is during builds
 ├── src/
-│   ├── config.ts           # EmailJS configuration and contact categories
-│   ├── content*.ts         # Localized copy and helper utilities
-│   ├── contact.ts          # Contact page entrypoint and form logic
-│   ├── main.ts             # Landing page entrypoint and sidebar controls
-│   └── style.css           # Shared styling for both entrypoints
-├── index.html              # Landing page HTML shell
-├── contact.html            # Contact page HTML shell
+│   ├── config/             # Configuration (EmailJS, constants)
+│   ├── content/            # Localized content
+│   ├── logic/              # Business logic and view renderers
+│   ├── pages/              # Page entry points (home.ts, contact-success.ts)
+│   └── styles/             # CSS stylesheets
+├── index.html              # Main SPA HTML shell
 ├── contact-success.html    # Post-submission success page
 ├── package.json            # Scripts and dependency manifest
 └── vite.config.ts          # Vite configuration

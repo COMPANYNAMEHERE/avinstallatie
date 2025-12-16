@@ -1,2 +1,27 @@
-- design
-- contact met jsmail
+TODO:
+- optimize images
+headerbutton png >headerbutton webp
+
+- working mail (protected adress)
+
+-
+
+
+
+
+
+
+- design, skeuormorphism for mainpage
+- make contacts notepad two images for more dynamic text
+- update headericon to fit styling skeuomorphism
+- contact met jsmai
+
+- images in svg/optimized for web
+- 
+
+useful links:
+https://blog.maximeheckel.com/posts/the-art-of-dithering-and-retro-shading-web/
+
+
+inspiration:
+https://maximeheckel.com

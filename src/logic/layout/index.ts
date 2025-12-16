@@ -37,7 +37,7 @@ export const layoutMarkup = ({
       </a>
       <a
         class="sidebar__nav-link"
-        href="${basePath}contact.html"
+        href="${basePath}contact"
         data-route="contact"
         data-i18n="nav.contact"
       >

@@ -22,8 +22,8 @@ const enContent = {
     form: {
       nameLabel: "Full name",
       namePlaceholder: "Your full name",
-      emailLabel: "Email address",
-      emailPlaceholder: "name@example.com",
+      emailLabel: "Your Email (optional)",
+      emailPlaceholder: "Your email address",
       categoryLabel: "Category",
       messageLabel: "Project details",
       messagePlaceholder: "Tell Koert about the space, timeline, and AV requirements.",
@@ -33,6 +33,21 @@ const enContent = {
       errorRequest: "Failed to send message. Please try again.",
       errorUnknown: "Something went wrong while sending. Please try again."
     }
+  },
+  resultPage: {
+    success: {
+      title: "Message sent",
+      message: "Thanks for reaching out. Koert will get back to you shortly.",
+      redirect: "Returning to the homepage in",
+      button: "Back to home"
+    },
+    error: {
+      title: "Message failed",
+      message: "Something went wrong while sending your message. Please try again.",
+      redirect: "Returning to the contact form in",
+      button: "Back to contact"
+    },
+    seconds: "seconds..."
   }
 } as const;
 

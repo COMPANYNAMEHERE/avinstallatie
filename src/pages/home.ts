@@ -1,5 +1,6 @@
 import headerButtonSrc from "../../assets/headerbutton-transparent.png";
 import "../styles/main.css";
+import "../styles/contact.css";
 import {
   backgroundImage,
   localizedContent,
@@ -50,7 +51,7 @@ if (!site || !pageOutlet) {
 const homeRoute: LayoutRoute = "home";
 const contactRoute: LayoutRoute = "contact";
 
-let currentRoute: LayoutRoute = window.location.pathname.endsWith("contact.html") ? contactRoute : homeRoute;
+let currentRoute: LayoutRoute = window.location.pathname.endsWith("/contact") ? contactRoute : homeRoute;
 let layoutControls: LayoutControls | null = null;
 
 const renderRoute = (route: LayoutRoute) => {
@@ -84,7 +85,7 @@ const navigateToRoute = (
   layoutControls?.setActiveRoute(route);
 
   if (options.push !== false) {
-    const targetUrl = route === homeRoute ? basePath : `${basePath}contact.html`;
+    const targetUrl = route === homeRoute ? basePath : `${basePath}contact`;
     history.pushState({ route }, "", targetUrl);
   }
 };
